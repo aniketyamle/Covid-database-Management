@@ -1,4 +1,4 @@
-1.Connected to Omega and Mysql server
+1.Connected to Mysql server
 
     Created a creation.sql file to execute all create table statements for state,county,confirmed_cases,deathss and vaccinations.
     Output file of creation.sql is tablescreated .
