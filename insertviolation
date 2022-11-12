@@ -1,0 +1,40 @@
+mysql> Insert into State (state_id,state,abbreviation,yearofstatehood,capital,capital_since,landarea,ispopulouscity ,municipalpopulation,metropopulation) values (51,'Texas','TM',1900,'Arlington',2022,420.5,'No',121212,345678);
+ERROR 1062 (23000): Duplicate entry 'Texas' for key 'state.PRIMARY'
+
+It is violating key integrity constraint as Texas is already part of state table where state is primary key.According to definition of primary key ,it cannot be null and needs to be unique.
+
+
+mysql> Insert into State (state_id,state,abbreviation,yearofstatehood,capital,capital_since,landarea,ispopulouscity ,municipalpopulation,metropopulation) values (A,'India','TM',1900,'Arlington',2022,420.5,'No',121212,345678);
+ERROR 1054 (42S22): Unknown column 'A' in 'field list'
+
+It is violating domain integrity constraint as stated is part of state table where state_id as column where constraint specified for column is it should be integer.We are trying to execute insert query with state_id containing value as 'A' which is character and cannot be insert to int data type .
+
+
+mysql> Insert into County (state,county,population,latitude,longitude) values ('India','Alam',50000,35.24567000,35.24567000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`axy9230`.`county`, CONSTRAINT `county_ibfk_1` FOREIGN KEY (`State`) REFERENCES `state` (`State`))
+
+
+It is violating referential integrity constraint as State is referenced as foreign key in County table which linked to State table. We are trying to insert new state which is not part of state table .So insertion query gets failed
+
+
+
+mysql> Insert into County (state,county,population,latitude,longitude) values ('Washington',null,50000,35.24567000,35.24567000);
+ERROR 1048 (23000): Column 'County' cannot be null
+
+It is violating entity integrity constraint as county is part of state table where it cannot be null.Insertion query contains the parameter holding null value which is preventing it from insertion.
+
+mysql> INSERT INTO Confirmed_cases(State,County ,TestDate,PositiveCount) VALUES ('Maharashtra','Pune','2022-10-10',250);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`axy9230`.`confirmed_cases`, CONSTRAINT `confirmed_cases_ibfk_1` FOREIGN KEY (`State`) REFERENCES `state` (`State`))
+
+
+mysql> INSERT INTO deathss(State,County ,ReportDate,DeathCount) VALUES ('Maharashtra','Pune','2022-10-10',1000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`axy9230`.`deathss`, CONSTRAINT `deathss_ibfk_1` FOREIGN KEY (`State`) REFERENCES `state` (`State`))
+mysql> 
+
+mysql> INSERT INTO deathss(State,County ,ReportDate,DeathCount) VALUES ('Maharashtra','2022-10-10',1000);
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+
+mysql> INSERT INTO deathss(State,County ,ReportDate,DeathCount) VALUES ('Maharashtra',null,'2022-10-10',1000);
+ERROR 1048 (23000): Column 'County' cannot be null
+mysql> \t
+

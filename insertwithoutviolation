@@ -1,0 +1,16 @@
+mysql> Insert into State (state_id,state,abbreviation,yearofstatehood,capital,capital_since,landarea,ispopulouscity ,municipalpopulation,metropopulation) values (51,'India','TM',1900,'Arlington',2022,420.5,'No',121212,345678);
+Query OK, 1 row affected, 1 warning (0.03 sec)
+
+mysql> Insert into deathss(State,County,reportdate,deathcount) values ('Texas','Tarrant','2022-10-10',250);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> Insert into confirmed_cases(state,county,testdate,positiveCount) values ('Texas','Tarrant','2022-10-10',25);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> Insert into County (state,county,population,latitude,longitude) values ('Washington','Yamle',50000,35.24567000,35.24567000);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> \t
+
+
+Insertion of queries executed successfully when provided proper parameter into insert statements.

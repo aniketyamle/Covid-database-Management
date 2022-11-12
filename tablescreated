@@ -1,0 +1,12 @@
+mysql> source creation.sql
+Query OK, 0 rows affected (0.08 sec)
+
+Query OK, 0 rows affected (0.08 sec)
+
+Query OK, 0 rows affected (0.08 sec)
+
+Query OK, 0 rows affected (0.08 sec)
+
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> \t

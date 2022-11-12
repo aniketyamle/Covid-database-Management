@@ -1,0 +1,1449 @@
+
+
+mysql> use axy9230
+Database changed
+
+#Query 1: 1)Print the name of state with largest in size
+
+mysql> select state from state where landarea =(select max(landarea) from state) ;
++--------+
+| state  |
++--------+
+| Alaska |
++--------+
+1 row in set (0.02 sec)
+
+
+
+#Query 2:Retrieve the names of counties, their parent state, their population, number of positive cases by date, sorted in the order of highest to lowest density of positive cases per thousand of population
+
+
+SQL Query:
+select cc.county,cc.state,c.population,cc.PositiveCount,cc.TestDate
+from county c join confirmed_cases cc on C.State=cc.State  
+order by (cc.PositiveCount/(c.population*0.001)) desc;
+
+Output File size for this particular query  was more than 10 GB.So didn't attached text file.
+
+
+
+
+
+
+#Query3: similar report as above, but for density of deaths per thousand of population
+
+Query:
+select d.county,d.state,c.population,d.DeathCount,d.ReportDate
+from county c join deathss d on C.State=d.State  
+order by (d.DeathCount/(c.population*0.001)) desc;
+
+Output File size for this particular query was more than 10 GB.So didn't attached text file.
+
+
+
+
+
+Query 4:Show a report for top 10 sensitive counties per state from positive case point of view
+
+SQL:
+
+mysql> 
+mysql> select * from (
+    -> select c.state as state, c.county as county, sum(cc.PositiveCount) as cases, ROW_NUMBER() 
+    -> over (PARTITION BY state order by sum(cc.PositiveCount) desc) as ro
+    -> from county c
+    -> join confirmed_cases cc on c.county = cc.county and c.state = cc.state
+    -> group by c.state, c.county) rs WHERE ro <= 10;
++----------------+-------------------------------------------+---------+----+
+| state          | county                                    | cases   | ro |
++----------------+-------------------------------------------+---------+----+
+| Alabama        | Jefferson                                 |   67639 |  1 |
+| Alabama        | Mobile                                    |   33449 |  2 |
+| Alabama        | Madison                                   |   30103 |  3 |
+| Alabama        | Tuscaloosa                                |   22731 |  4 |
+| Alabama        | Montgomery                                |   21157 |  5 |
+| Alabama        | Shelby                                    |   20501 |  6 |
+| Alabama        | Baldwin                                   |   18418 |  7 |
+| Alabama        | Lee                                       |   14048 |  8 |
+| Alabama        | Morgan                                    |   13086 |  9 |
+| Alabama        | Etowah                                    |   12642 | 10 |
+| Alaska         | Anchorage                                 |   25641 |  1 |
+| Alaska         | Matanuska-Susitna                         |    7603 |  2 |
+| Alaska         | Fairbanks North Star                      |    5909 |  3 |
+| Alaska         | Kenai Peninsula                           |    3929 |  4 |
+| Alaska         | Bethel                                    |    3347 |  5 |
+| Alaska         | Juneau                                    |    1184 |  6 |
+| Alaska         | Kusilvak                                  |    1126 |  7 |
+| Alaska         | Kodiak Island                             |    1043 |  8 |
+| Alaska         | North Slope                               |     985 |  9 |
+| Alaska         | Northwest Arctic                          |     573 | 10 |
+| Arizona        | Maricopa                                  |  478354 |  1 |
+| Arizona        | Pima                                      |  102712 |  2 |
+| Arizona        | Pinal                                     |   43151 |  3 |
+| Arizona        | Yuma                                      |   35318 |  4 |
+| Arizona        | Mohave                                    |   19782 |  5 |
+| Arizona        | Yavapai                                   |   16407 |  6 |
+| Arizona        | Coconino                                  |   15376 |  7 |
+| Arizona        | Navajo                                    |   14645 |  8 |
+| Arizona        | Cochise                                   |   10500 |  9 |
+| Arizona        | Apache                                    |    9684 | 10 |
+| Arkansas       | Pulaski                                   |   34651 |  1 |
+| Arkansas       | Washington                                |   27963 |  2 |
+| Arkansas       | Benton                                    |   25477 |  3 |
+| Arkansas       | Sebastian                                 |   13715 |  4 |
+| Arkansas       | Craighead                                 |   12290 |  5 |
+| Arkansas       | Faulkner                                  |   10929 |  6 |
+| Arkansas       | Saline                                    |   10625 |  7 |
+| Arkansas       | Garland                                   |    8628 |  8 |
+| Arkansas       | Jefferson                                 |    8172 |  9 |
+| Arkansas       | Pope                                      |    7272 | 10 |
+| California     | Los Angeles                               | 1129503 |  1 |
+| California     | Riverside                                 |  277724 |  2 |
+| California     | San Bernardino                            |  275960 |  3 |
+| California     | Orange                                    |  248510 |  4 |
+| California     | San Diego                                 |  241018 |  5 |
+| California     | Santa Clara                               |  103236 |  6 |
+| California     | Kern                                      |   94994 |  7 |
+| California     | Fresno                                    |   89542 |  8 |
+| California     | Sacramento                                |   87107 |  9 |
+| California     | Alameda                                   |   74959 | 10 |
+| Colorado       | Denver                                    |   56051 |  1 |
+| Colorado       | El Paso                                   |   48056 |  2 |
+| Colorado       | Adams                                     |   45982 |  3 |
+| Colorado       | Arapahoe                                  |   45359 |  4 |
+| Colorado       | Jefferson                                 |   34827 |  5 |
+| Colorado       | Weld                                      |   23841 |  6 |
+| Colorado       | Douglas                                   |   19205 |  7 |
+| Colorado       | Larimer                                   |   18246 |  8 |
+| Colorado       | Boulder                                   |   17369 |  9 |
+| Colorado       | Pueblo                                    |   14381 | 10 |
+| Connecticut    | Fairfield                                 |   73762 |  1 |
+| Connecticut    | Hartford                                  |   64924 |  2 |
+| Connecticut    | New Haven                                 |   64889 |  3 |
+| Connecticut    | New London                                |   17373 |  4 |
+| Connecticut    | Litchfield                                |   10165 |  5 |
+| Connecticut    | Middlesex                                 |    9481 |  6 |
+| Connecticut    | Windham                                   |    8475 |  7 |
+| Connecticut    | Tolland                                   |    7090 |  8 |
+| Connecticut    | Unassigned                                |     845 |  9 |
+| Connecticut    | Out of CT                                 |       0 | 10 |
+| Delaware       | New Castle                                |   44833 |  1 |
+| Delaware       | Sussex                                    |   20940 |  2 |
+| Delaware       | Kent                                      |   13031 |  3 |
+| Delaware       | Unassigned                                |     178 |  4 |
+| Delaware       | Out of DE                                 |       0 |  5 |
+| Florida        | Miami-Dade                                |  376552 |  1 |
+| Florida        | Broward                                   |  175306 |  2 |
+| Florida        | Palm Beach                                |  108585 |  3 |
+| Florida        | Orange                                    |  104621 |  4 |
+| Florida        | Hillsborough                              |  101910 |  5 |
+| Florida        | Duval                                     |   82963 |  6 |
+| Florida        | Pinellas                                  |   60322 |  7 |
+| Florida        | Lee                                       |   53332 |  8 |
+| Florida        | Polk                                      |   51297 |  9 |
+| Florida        | Osceola                                   |   33993 | 10 |
+| Georgia        | Gwinnett                                  |   84740 |  1 |
+| Georgia        | Fulton                                    |   78400 |  2 |
+| Georgia        | Cobb                                      |   63643 |  3 |
+| Georgia        | DeKalb                                    |   51986 |  4 |
+| Georgia        | Out of GA                                 |   28189 |  5 |
+| Georgia        | Cherokee                                  |   24595 |  6 |
+| Georgia        | Hall                                      |   24228 |  7 |
+| Georgia        | Richmond                                  |   20871 |  8 |
+| Georgia        | Clayton                                   |   19979 |  9 |
+| Georgia        | Henry                                     |   19439 | 10 |
+| Hawaii         | Honolulu                                  |   21237 |  1 |
+| Hawaii         | Maui                                      |    2376 |  2 |
+| Hawaii         | Hawaii                                    |    2206 |  3 |
+| Hawaii         | Out of HI                                 |     286 |  4 |
+| Hawaii         | Kauai                                     |     181 |  5 |
+| Hawaii         | Kalawao                                   |       0 |  6 |
+| Hawaii         | Unassigned                                |       0 |  7 |
+| Idaho          | Ada                                       |   44869 |  1 |
+| Idaho          | Canyon                                    |   23911 |  2 |
+| Idaho          | Kootenai                                  |   15871 |  3 |
+| Idaho          | Bonneville                                |   11539 |  4 |
+| Idaho          | Twin Falls                                |    8793 |  5 |
+| Idaho          | Bannock                                   |    7413 |  6 |
+| Idaho          | Madison                                   |    5932 |  7 |
+| Idaho          | Bingham                                   |    4080 |  8 |
+| Idaho          | Nez Perce                                 |    3310 |  9 |
+| Idaho          | Cassia                                    |    2787 | 10 |
+| Illinois       | Cook                                      |  456144 |  1 |
+| Illinois       | DuPage                                    |   72945 |  2 |
+| Illinois       | Will                                      |   61737 |  3 |
+| Illinois       | Lake                                      |   56469 |  4 |
+| Illinois       | Kane                                      |   48542 |  5 |
+| Illinois       | Winnebago                                 |   27428 |  6 |
+| Illinois       | Madison                                   |   26467 |  7 |
+| Illinois       | St. Clair                                 |   23940 |  8 |
+| Illinois       | McHenry                                   |   22976 |  9 |
+| Illinois       | Champaign                                 |   16571 | 10 |
+| Indiana        | Marion                                    |   87016 |  1 |
+| Indiana        | Lake                                      |   46651 |  2 |
+| Indiana        | Allen                                     |   33947 |  3 |
+| Indiana        | Hamilton                                  |   30544 |  4 |
+| Indiana        | St. Joseph                                |   28096 |  5 |
+| Indiana        | Elkhart                                   |   24781 |  6 |
+| Indiana        | Vanderburgh                               |   20294 |  7 |
+| Indiana        | Tippecanoe                                |   18663 |  8 |
+| Indiana        | Johnson                                   |   15682 |  9 |
+| Indiana        | Porter                                    |   15263 | 10 |
+| Iowa           | Polk                                      |   48567 |  1 |
+| Iowa           | Linn                                      |   18715 |  2 |
+| Iowa           | Scott                                     |   16388 |  3 |
+| Iowa           | Black Hawk                                |   14468 |  4 |
+| Iowa           | Woodbury                                  |   13319 |  5 |
+| Iowa           | Johnson                                   |   12582 |  6 |
+| Iowa           | Dubuque                                   |   11911 |  7 |
+| Iowa           | Dallas                                    |    9466 |  8 |
+| Iowa           | Pottawattamie                             |    9416 |  9 |
+| Iowa           | Story                                     |    9096 | 10 |
+| Kansas         | Sedgwick                                  |   50800 |  1 |
+| Kansas         | Johnson                                   |   50392 |  2 |
+| Kansas         | Wyandotte                                 |   18309 |  3 |
+| Kansas         | Shawnee                                   |   15425 |  4 |
+| Kansas         | Douglas                                   |    8238 |  5 |
+| Kansas         | Reno                                      |    8094 |  6 |
+| Kansas         | Butler                                    |    6863 |  7 |
+| Kansas         | Leavenworth                               |    6304 |  8 |
+| Kansas         | Riley                                     |    6025 |  9 |
+| Kansas         | Finney                                    |    5913 | 10 |
+| Kentucky       | Jefferson                                 |   67208 |  1 |
+| Kentucky       | Fayette                                   |   30165 |  2 |
+| Kentucky       | Warren                                    |   13519 |  3 |
+| Kentucky       | Kenton                                    |   13162 |  4 |
+| Kentucky       | Boone                                     |   11073 |  5 |
+| Kentucky       | Daviess                                   |    8833 |  6 |
+| Kentucky       | Hardin                                    |    8105 |  7 |
+| Kentucky       | Madison                                   |    7831 |  8 |
+| Kentucky       | Campbell                                  |    6928 |  9 |
+| Kentucky       | Oldham                                    |    6524 | 10 |
+| Louisiana      | Jefferson                                 |   41691 |  1 |
+| Louisiana      | East Baton Rouge                          |   33174 |  2 |
+| Louisiana      | Orleans                                   |   26883 |  3 |
+| Louisiana      | Caddo                                     |   23126 |  4 |
+| Louisiana      | St. Tammany                               |   22029 |  5 |
+| Louisiana      | Lafayette                                 |   20784 |  6 |
+| Louisiana      | Calcasieu                                 |   18094 |  7 |
+| Louisiana      | Ouachita                                  |   17222 |  8 |
+| Louisiana      | Bossier                                   |   12105 |  9 |
+| Louisiana      | Livingston                                |   11504 | 10 |
+| Maine          | Cumberland                                |   11427 |  1 |
+| Maine          | York                                      |    8584 |  2 |
+| Maine          | Androscoggin                              |    4391 |  3 |
+| Maine          | Penobscot                                 |    3490 |  4 |
+| Maine          | Kennebec                                  |    3231 |  5 |
+| Maine          | Oxford                                    |    1956 |  6 |
+| Maine          | Aroostook                                 |    1165 |  7 |
+| Maine          | Somerset                                  |    1110 |  8 |
+| Maine          | Sagadahoc                                 |     812 |  9 |
+| Maine          | Hancock                                   |     801 | 10 |
+| Maryland       | Prince George's                           |   68490 |  1 |
+| Maryland       | Montgomery                                |   59439 |  2 |
+| Maryland       | Baltimore                                 |   47735 |  3 |
+| Maryland       | Baltimore City                            |   38194 |  4 |
+| Maryland       | Anne Arundel                              |   33194 |  5 |
+| Maryland       | Frederick                                 |   15759 |  6 |
+| Maryland       | Howard                                    |   14704 |  7 |
+| Maryland       | Washington                                |   11521 |  8 |
+| Maryland       | Harford                                   |   11481 |  9 |
+| Maryland       | Charles                                   |    8126 | 10 |
+| Massachusetts  | Middlesex                                 |  103162 |  1 |
+| Massachusetts  | Essex                                     |   78059 |  2 |
+| Massachusetts  | Suffolk                                   |   72287 |  3 |
+| Massachusetts  | Worcester                                 |   60056 |  4 |
+| Massachusetts  | Bristol                                   |   51164 |  5 |
+| Massachusetts  | Norfolk                                   |   41091 |  6 |
+| Massachusetts  | Hampden                                   |   37731 |  7 |
+| Massachusetts  | Plymouth                                  |   36608 |  8 |
+| Massachusetts  | Unassigned                                |   28001 |  9 |
+| Massachusetts  | Barnstable                                |    8920 | 10 |
+| Michigan       | Wayne                                     |   97402 |  1 |
+| Michigan       | Oakland                                   |   71177 |  2 |
+| Michigan       | Macomb                                    |   56293 |  3 |
+| Michigan       | Kent                                      |   49660 |  4 |
+| Michigan       | Genesee                                   |   24486 |  5 |
+| Michigan       | Michigan Department of Corrections (MDOC) |   23856 |  6 |
+| Michigan       | Ottawa                                    |   21399 |  7 |
+| Michigan       | Washtenaw                                 |   17028 |  8 |
+| Michigan       | Ingham                                    |   15267 |  9 |
+| Michigan       | Kalamazoo                                 |   14345 | 10 |
+| Minnesota      | Hennepin                                  |   96262 |  1 |
+| Minnesota      | Ramsey                                    |   41383 |  2 |
+| Minnesota      | Dakota                                    |   34335 |  3 |
+| Minnesota      | Anoka                                     |   31905 |  4 |
+| Minnesota      | Washington                                |   21005 |  5 |
+| Minnesota      | Stearns                                   |   18291 |  6 |
+| Minnesota      | St. Louis                                 |   14251 |  7 |
+| Minnesota      | Scott                                     |   12517 |  8 |
+| Minnesota      | Wright                                    |   12004 |  9 |
+| Minnesota      | Olmsted                                   |   11171 | 10 |
+| Mississippi    | DeSoto                                    |   18490 |  1 |
+| Mississippi    | Hinds                                     |   17748 |  2 |
+| Mississippi    | Harrison                                  |   15412 |  3 |
+| Mississippi    | Rankin                                    |   11796 |  4 |
+| Mississippi    | Jackson                                   |   11590 |  5 |
+| Mississippi    | Lee                                       |    9323 |  6 |
+| Mississippi    | Madison                                   |    9009 |  7 |
+| Mississippi    | Jones                                     |    7332 |  8 |
+| Mississippi    | Forrest                                   |    6542 |  9 |
+| Mississippi    | Lauderdale                                |    6425 | 10 |
+| Missouri       | St. Louis                                 |   84254 |  1 |
+| Missouri       | Kansas City                               |   35799 |  2 |
+| Missouri       | St. Charles                               |   31696 |  3 |
+| Missouri       | Jackson                                   |   28660 |  4 |
+| Missouri       | Greene                                    |   22517 |  5 |
+| Missouri       | St. Louis City                            |   20453 |  6 |
+| Missouri       | Jefferson                                 |   18380 |  7 |
+| Missouri       | Boone                                     |   15430 |  8 |
+| Missouri       | Jasper                                    |   11772 |  9 |
+| Missouri       | Cole                                      |    8399 | 10 |
+| Montana        | Yellowstone                               |   15582 |  1 |
+| Montana        | Gallatin                                  |   11472 |  2 |
+| Montana        | Flathead                                  |   10250 |  3 |
+| Montana        | Missoula                                  |    7759 |  4 |
+| Montana        | Cascade                                   |    7336 |  5 |
+| Montana        | Lewis and Clark                           |    5969 |  6 |
+| Montana        | Silver Bow                                |    3490 |  7 |
+| Montana        | Ravalli                                   |    2506 |  8 |
+| Montana        | Big Horn                                  |    2273 |  9 |
+| Montana        | Hill                                      |    1833 | 10 |
+| Nebraska       | Douglas                                   |   61564 |  1 |
+| Nebraska       | Lancaster                                 |   26938 |  2 |
+| Nebraska       | Sarpy                                     |   18524 |  3 |
+| Nebraska       | Hall                                      |    6697 |  4 |
+| Nebraska       | Buffalo                                   |    4845 |  5 |
+| Nebraska       | Dodge                                     |    4437 |  6 |
+| Nebraska       | Madison                                   |    4038 |  7 |
+| Nebraska       | Platte                                    |    3776 |  8 |
+| Nebraska       | Dakota                                    |    3660 |  9 |
+| Nebraska       | Lincoln                                   |    3437 | 10 |
+| Nevada         | Clark                                     |  216121 |  1 |
+| Nevada         | Washoe                                    |   41491 |  2 |
+| Nevada         | Carson City                               |    5720 |  3 |
+| Nevada         | Elko                                      |    4304 |  4 |
+| Nevada         | Nye                                       |    2634 |  5 |
+| Nevada         | Lyon                                      |    2610 |  6 |
+| Nevada         | Douglas                                   |    2396 |  7 |
+| Nevada         | Churchill                                 |    1839 |  8 |
+| Nevada         | Humboldt                                  |    1013 |  9 |
+| Nevada         | Pershing                                  |     907 | 10 |
+| New Hampshire  | Hillsborough                              |   25948 |  1 |
+| New Hampshire  | Rockingham                                |   16257 |  2 |
+| New Hampshire  | Merrimack                                 |    6749 |  3 |
+| New Hampshire  | Strafford                                 |    5752 |  4 |
+| New Hampshire  | Belknap                                   |    2860 |  5 |
+| New Hampshire  | Cheshire                                  |    2275 |  6 |
+| New Hampshire  | Grafton                                   |    2013 |  7 |
+| New Hampshire  | Carroll                                   |    1516 |  8 |
+| New Hampshire  | Coos                                      |    1167 |  9 |
+| New Hampshire  | Sullivan                                  |    1142 | 10 |
+| New Jersey     | Bergen                                    |   68134 |  1 |
+| New Jersey     | Essex                                     |   65963 |  2 |
+| New Jersey     | Middlesex                                 |   65019 |  3 |
+| New Jersey     | Hudson                                    |   61987 |  4 |
+| New Jersey     | Passaic                                   |   51891 |  5 |
+| New Jersey     | Union                                     |   51740 |  6 |
+| New Jersey     | Ocean                                     |   51021 |  7 |
+| New Jersey     | Monmouth                                  |   49757 |  8 |
+| New Jersey     | Camden                                    |   40798 |  9 |
+| New Jersey     | Morris                                    |   32853 | 10 |
+| New Mexico     | Bernalillo                                |   49691 |  1 |
+| New Mexico     | Dona Ana                                  |   21270 |  2 |
+| New Mexico     | San Juan                                  |   13072 |  3 |
+| New Mexico     | McKinley                                  |   11638 |  4 |
+| New Mexico     | Sandoval                                  |   10255 |  5 |
+| New Mexico     | Santa Fe                                  |    9226 |  6 |
+| New Mexico     | Chaves                                    |    8279 |  7 |
+| New Mexico     | Lea                                       |    7865 |  8 |
+| New Mexico     | Eddy                                      |    6052 |  9 |
+| New Mexico     | Valencia                                  |    5861 | 10 |
+| New York       | Queens                                    |  181723 |  1 |
+| New York       | Kings                                     |  178939 |  2 |
+| New York       | Suffolk                                   |  145642 |  3 |
+| New York       | Nassau                                    |  130933 |  4 |
+| New York       | Bronx                                     |  122235 |  5 |
+| New York       | Westchester                               |   95642 |  6 |
+| New York       | New York                                  |   87468 |  7 |
+| New York       | Erie                                      |   58099 |  8 |
+| New York       | Richmond                                  |   50515 |  9 |
+| New York       | Monroe                                    |   48534 | 10 |
+| North Carolina | Mecklenburg                               |   88055 |  1 |
+| North Carolina | Wake                                      |   66959 |  2 |
+| North Carolina | Guilford                                  |   36020 |  3 |
+| North Carolina | Forsyth                                   |   28501 |  4 |
+| North Carolina | Gaston                                    |   21681 |  5 |
+| North Carolina | Cumberland                                |   21049 |  6 |
+| North Carolina | Durham                                    |   19728 |  7 |
+| North Carolina | Union                                     |   18714 |  8 |
+| North Carolina | Cabarrus                                  |   16577 |  9 |
+| North Carolina | Johnston                                  |   15996 | 10 |
+| North Dakota   | Cass                                      |   21005 |  1 |
+| North Dakota   | Burleigh                                  |   14321 |  2 |
+| North Dakota   | Grand Forks                               |    9673 |  3 |
+| North Dakota   | Ward                                      |    8961 |  4 |
+| North Dakota   | Morton                                    |    4859 |  5 |
+| North Dakota   | Williams                                  |    4328 |  6 |
+| North Dakota   | Stark                                     |    4260 |  7 |
+| North Dakota   | Stutsman                                  |    3248 |  8 |
+| North Dakota   | Rolette                                   |    2080 |  9 |
+| North Dakota   | Walsh                                     |    1737 | 10 |
+| Ohio           | Franklin                                  |  105796 |  1 |
+| Ohio           | Cuyahoga                                  |   89881 |  2 |
+| Ohio           | Hamilton                                  |   68156 |  3 |
+| Ohio           | Montgomery                                |   44954 |  4 |
+| Ohio           | Summit                                    |   36929 |  5 |
+| Ohio           | Lucas                                     |   32974 |  6 |
+| Ohio           | Butler                                    |   32764 |  7 |
+| Ohio           | Stark                                     |   27331 |  8 |
+| Ohio           | Warren                                    |   20836 |  9 |
+| Ohio           | Lorain                                    |   20311 | 10 |
+| Oklahoma       | Oklahoma                                  |   75891 |  1 |
+| Oklahoma       | Tulsa                                     |   65112 |  2 |
+| Oklahoma       | Cleveland                                 |   26603 |  3 |
+| Oklahoma       | Canadian                                  |   14471 |  4 |
+| Oklahoma       | Comanche                                  |   10568 |  5 |
+| Oklahoma       | Rogers                                    |    9280 |  6 |
+| Oklahoma       | Muskogee                                  |    8550 |  7 |
+| Oklahoma       | Payne                                     |    7936 |  8 |
+| Oklahoma       | Pottawatomie                              |    7227 |  9 |
+| Oklahoma       | Wagoner                                   |    7070 | 10 |
+| Oregon         | Multnomah                                 |   30278 |  1 |
+| Oregon         | Washington                                |   20023 |  2 |
+| Oregon         | Marion                                    |   17424 |  3 |
+| Oregon         | Clackamas                                 |   12655 |  4 |
+| Oregon         | Lane                                      |    9316 |  5 |
+| Oregon         | Jackson                                   |    7594 |  6 |
+| Oregon         | Umatilla                                  |    7222 |  7 |
+| Oregon         | Deschutes                                 |    5468 |  8 |
+| Oregon         | Yamhill                                   |    3475 |  9 |
+| Oregon         | Linn                                      |    3363 | 10 |
+| Pennsylvania   | Philadelphia                              |  111098 |  1 |
+| Pennsylvania   | Allegheny                                 |   70165 |  2 |
+| Pennsylvania   | Montgomery                                |   49270 |  3 |
+| Pennsylvania   | Bucks                                     |   40698 |  4 |
+| Pennsylvania   | Lancaster                                 |   39065 |  5 |
+| Pennsylvania   | Delaware                                  |   37727 |  6 |
+| Pennsylvania   | Berks                                     |   32957 |  7 |
+| Pennsylvania   | York                                      |   32578 |  8 |
+| Pennsylvania   | Lehigh                                    |   28427 |  9 |
+| Pennsylvania   | Chester                                   |   25762 | 10 |
+| Rhode Island   | Providence                                |   76727 |  1 |
+| Rhode Island   | Kent                                      |   14129 |  2 |
+| Rhode Island   | Unassigned                                |   10562 |  3 |
+| Rhode Island   | Washington                                |    6765 |  4 |
+| Rhode Island   | Newport                                   |    4631 |  5 |
+| Rhode Island   | Bristol                                   |    3890 |  6 |
+| Rhode Island   | Out of RI                                 |       0 |  7 |
+| South Carolina | Greenville                                |   56779 |  1 |
+| South Carolina | Richland                                  |   36340 |  2 |
+| South Carolina | Charleston                                |   33516 |  3 |
+| South Carolina | Spartanburg                               |   30405 |  4 |
+| South Carolina | Horry                                     |   29568 |  5 |
+| South Carolina | Lexington                                 |   25077 |  6 |
+| South Carolina | York                                      |   22640 |  7 |
+| South Carolina | Anderson                                  |   17817 |  8 |
+| South Carolina | Florence                                  |   15191 |  9 |
+| South Carolina | Pickens                                   |   14869 | 10 |
+| South Dakota   | Minnehaha                                 |   27109 |  1 |
+| South Dakota   | Pennington                                |   12424 |  2 |
+| South Dakota   | Lincoln                                   |    7486 |  3 |
+| South Dakota   | Brown                                     |    4966 |  4 |
+| South Dakota   | Codington                                 |    3766 |  5 |
+| South Dakota   | Brookings                                 |    3440 |  6 |
+| South Dakota   | Davison                                   |    2905 |  7 |
+| South Dakota   | Lawrence                                  |    2758 |  8 |
+| South Dakota   | Yankton                                   |    2748 |  9 |
+| South Dakota   | Beadle                                    |    2614 | 10 |
+| Tennessee      | Shelby                                    |   81572 |  1 |
+| Tennessee      | Davidson                                  |   75423 |  2 |
+| Tennessee      | Knox                                      |   41888 |  3 |
+| Tennessee      | Hamilton                                  |   37462 |  4 |
+| Tennessee      | Rutherford                                |   35394 |  5 |
+| Tennessee      | Unassigned                                |   24941 |  6 |
+| Tennessee      | Williamson                                |   23250 |  7 |
+| Tennessee      | Sumner                                    |   19478 |  8 |
+| Tennessee      | Out of TN                                 |   16527 |  9 |
+| Tennessee      | Montgomery                                |   15913 | 10 |
+| Texas          | Harris                                    |  323408 |  1 |
+| Texas          | Dallas                                    |  262738 |  2 |
+| Texas          | Tarrant                                   |  223761 |  3 |
+| Texas          | Bexar                                     |  177802 |  4 |
+| Texas          | El Paso                                   |  114819 |  5 |
+| Texas          | Collin                                    |   75051 |  6 |
+| Texas          | Travis                                    |   70631 |  7 |
+| Texas          | Hidalgo                                   |   66272 |  8 |
+| Texas          | Denton                                    |   55363 |  9 |
+| Texas          | Fort Bend                                 |   51916 | 10 |
+| Utah           | Salt Lake                                 |  131260 |  1 |
+| Utah           | Utah                                      |   85190 |  2 |
+| Utah           | Davis                                     |   32382 |  3 |
+| Utah           | Weber-Morgan                              |   26345 |  4 |
+| Utah           | Southwest Utah                            |   24990 |  5 |
+| Utah           | Bear River                                |   18804 |  6 |
+| Utah           | Central Utah                              |    7814 |  7 |
+| Utah           | Tooele                                    |    5988 |  8 |
+| Utah           | Summit                                    |    4647 |  9 |
+| Utah           | Wasatch                                   |    4116 | 10 |
+| Vermont        | Chittenden                                |    4135 |  1 |
+| Vermont        | Washington                                |    1254 |  2 |
+| Vermont        | Bennington                                |    1125 |  3 |
+| Vermont        | Rutland                                   |     956 |  4 |
+| Vermont        | Windsor                                   |     874 |  5 |
+| Vermont        | Franklin                                  |     831 |  6 |
+| Vermont        | Windham                                   |     811 |  7 |
+| Vermont        | Addison                                   |     607 |  8 |
+| Vermont        | Orange                                    |     432 |  9 |
+| Vermont        | Orleans                                   |     367 | 10 |
+| Virginia       | Fairfax                                   |   60265 |  1 |
+| Virginia       | Prince William                            |   35693 |  2 |
+| Virginia       | Virginia Beach                            |   26750 |  3 |
+| Virginia       | Loudoun                                   |   20791 |  4 |
+| Virginia       | Chesterfield                              |   19563 |  5 |
+| Virginia       | Henrico                                   |   18886 |  6 |
+| Virginia       | Chesapeake                                |   15793 |  7 |
+| Virginia       | Norfolk                                   |   13057 |  8 |
+| Virginia       | Richmond City                             |   13032 |  9 |
+| Virginia       | Arlington                                 |   11867 | 10 |
+| Washington     | King                                      |   79060 |  1 |
+| Washington     | Pierce                                    |   34653 |  2 |
+| Washington     | Spokane                                   |   33850 |  3 |
+| Washington     | Snohomish                                 |   28096 |  4 |
+| Washington     | Yakima                                    |   24797 |  5 |
+| Washington     | Clark                                     |   17809 |  6 |
+| Washington     | Benton                                    |   14244 |  7 |
+| Washington     | Franklin                                  |   10540 |  8 |
+| Washington     | Grant                                     |    7218 |  9 |
+| Washington     | Thurston                                  |    6468 | 10 |
+| West Virginia  | Kanawha                                   |   11206 |  1 |
+| West Virginia  | Berkeley                                  |    9031 |  2 |
+| West Virginia  | Cabell                                    |    7201 |  3 |
+| West Virginia  | Monongalia                                |    7183 |  4 |
+| West Virginia  | Wood                                      |    6586 |  5 |
+| West Virginia  | Harrison                                  |    4529 |  6 |
+| West Virginia  | Raleigh                                   |    4237 |  7 |
+| West Virginia  | Mercer                                    |    3946 |  8 |
+| West Virginia  | Putnam                                    |    3891 |  9 |
+| West Virginia  | Ohio                                      |    3427 | 10 |
+| Wisconsin      | Milwaukee                                 |  103941 |  1 |
+| Wisconsin      | Waukesha                                  |   43201 |  2 |
+| Wisconsin      | Dane                                      |   39669 |  3 |
+| Wisconsin      | Brown                                     |   31611 |  4 |
+| Wisconsin      | Racine                                    |   22400 |  5 |
+| Wisconsin      | Outagamie                                 |   20647 |  6 |
+| Wisconsin      | Winnebago                                 |   19137 |  7 |
+| Wisconsin      | Kenosha                                   |   16290 |  8 |
+| Wisconsin      | Rock                                      |   15296 |  9 |
+| Wisconsin      | Washington                                |   15038 | 10 |
+| Wyoming        | Laramie                                   |    8010 |  1 |
+| Wyoming        | Natrona                                   |    7555 |  2 |
+| Wyoming        | Campbell                                  |    4632 |  3 |
+| Wyoming        | Fremont                                   |    4513 |  4 |
+| Wyoming        | Albany                                    |    3791 |  5 |
+| Wyoming        | Sweetwater                                |    3519 |  6 |
+| Wyoming        | Teton                                     |    3161 |  7 |
+| Wyoming        | Sheridan                                  |    2905 |  8 |
+| Wyoming        | Park                                      |    2549 |  9 |
+| Wyoming        | Uinta                                     |    1981 | 10 |
++----------------+-------------------------------------------+---------+----+
+489 rows in set (10.19 sec)
+
+mysql> 
+
+
+
+
+
+
+
+
+Query 5:Print similar report (as 4) from number of death point of view.
+
+
+mysql> select * from (
+    -> select c.state as state, c.county as county, sum(d.DeathCount) as deaths, ROW_NUMBER() 
+    -> over (PARTITION BY state order by sum(d.DeathCount) desc) as rowss
+    -> from county c
+    -> join deathss d on d.county = c.county and d.state = c.state
+    -> group by c.state, c.county) rs WHERE rowss <= 10;
++----------------+----------------------+--------+-------+
+| state          | county               | deaths | rowss |
++----------------+----------------------+--------+-------+
+| Alabama        | Jefferson            |   1195 |     1 |
+| Alabama        | Mobile               |    630 |     2 |
+| Alabama        | Montgomery           |    402 |     3 |
+| Alabama        | Madison              |    345 |     4 |
+| Alabama        | Tuscaloosa           |    321 |     5 |
+| Alabama        | Etowah               |    265 |     6 |
+| Alabama        | Calhoun              |    239 |     7 |
+| Alabama        | Baldwin              |    228 |     8 |
+| Alabama        | Houston              |    220 |     9 |
+| Alabama        | Morgan               |    209 |    10 |
+| Alaska         | Anchorage            |    152 |     1 |
+| Alaska         | Matanuska-Susitna    |     29 |     2 |
+| Alaska         | Fairbanks North Star |     26 |     3 |
+| Alaska         | Kenai Peninsula      |     22 |     4 |
+| Alaska         | Bethel               |     17 |     5 |
+| Alaska         | Kodiak Island        |      5 |     6 |
+| Alaska         | Juneau               |      5 |     7 |
+| Alaska         | Yukon-Koyukuk        |      4 |     8 |
+| Alaska         | North Slope          |      3 |     9 |
+| Alaska         | Kusilvak             |      3 |    10 |
+| Arkansas       | Pulaski              |    524 |     1 |
+| Arkansas       | Benton               |    359 |     2 |
+| Arkansas       | Washington           |    312 |     3 |
+| Arkansas       | Sebastian            |    235 |     4 |
+| Arkansas       | Garland              |    210 |     5 |
+| Arkansas       | Craighead            |    171 |     6 |
+| Arkansas       | Saline               |    152 |     7 |
+| Arkansas       | Jefferson            |    152 |     8 |
+| Arkansas       | Faulkner             |    138 |     9 |
+| Arkansas       | Independence         |    114 |    10 |
+| California     | Los Angeles          |  17308 |     1 |
+| California     | Riverside            |   3278 |     2 |
+| California     | Orange               |   3199 |     3 |
+| California     | San Diego            |   2683 |     4 |
+| California     | San Bernardino       |   1966 |     5 |
+| California     | Santa Clara          |   1473 |     6 |
+| California     | Sacramento           |   1271 |     7 |
+| California     | Fresno               |   1185 |     8 |
+| California     | Alameda              |    999 |     9 |
+| California     | San Joaquin          |    871 |    10 |
+| Colorado       | Denver               |    742 |     1 |
+| Colorado       | El Paso              |    706 |     2 |
+| Colorado       | Jefferson            |    682 |     3 |
+| Colorado       | Arapahoe             |    617 |     4 |
+| Colorado       | Adams                |    590 |     5 |
+| Colorado       | Pueblo               |    359 |     6 |
+| Colorado       | Weld                 |    309 |     7 |
+| Colorado       | Douglas              |    218 |     8 |
+| Colorado       | Boulder              |    215 |     9 |
+| Colorado       | Larimer              |    199 |    10 |
+| Connecticut    | Hartford             |   2146 |     1 |
+| Connecticut    | Fairfield            |   1943 |     2 |
+| Connecticut    | New Haven            |   1810 |     3 |
+| Connecticut    | New London           |    371 |     4 |
+| Connecticut    | Middlesex            |    325 |     5 |
+| Connecticut    | Litchfield           |    259 |     6 |
+| Connecticut    | Windham              |    152 |     7 |
+| Connecticut    | Tolland              |    143 |     8 |
+| Connecticut    | Unassigned           |      8 |     9 |
+| Connecticut    | Out of CT            |      0 |    10 |
+| Delaware       | New Castle           |    561 |     1 |
+| Delaware       | Sussex               |    356 |     2 |
+| Delaware       | Kent                 |    213 |     3 |
+| Delaware       | Out of DE            |      0 |     4 |
+| Delaware       | Unassigned           |      0 |     5 |
+| Florida        | Miami-Dade           |   4919 |     1 |
+| Florida        | Palm Beach           |   2212 |     2 |
+| Florida        | Broward              |   2125 |     3 |
+| Florida        | Hillsborough         |   1336 |     4 |
+| Florida        | Pinellas             |   1307 |     5 |
+| Florida        | Orange               |    982 |     6 |
+| Florida        | Polk                 |    979 |     7 |
+| Florida        | Duval                |    945 |     8 |
+| Florida        | Lee                  |    808 |     9 |
+| Florida        | Brevard              |    663 |    10 |
+| Georgia        | Fulton               |    974 |     1 |
+| Georgia        | Gwinnett             |    790 |     2 |
+| Georgia        | Cobb                 |    762 |     3 |
+| Georgia        | DeKalb               |    671 |     4 |
+| Georgia        | Out of GA            |    434 |     5 |
+| Georgia        | Richmond             |    359 |     6 |
+| Georgia        | Hall                 |    340 |     7 |
+| Georgia        | Bibb                 |    333 |     8 |
+| Georgia        | Clayton              |    318 |     9 |
+| Georgia        | Chatham              |    312 |    10 |
+| Hawaii         | Honolulu             |    331 |     1 |
+| Hawaii         | Hawaii               |     53 |     2 |
+| Hawaii         | Maui                 |     26 |     3 |
+| Hawaii         | Out of HI            |      2 |     4 |
+| Hawaii         | Kauai                |      1 |     5 |
+| Hawaii         | Kalawao              |      0 |     6 |
+| Hawaii         | Unassigned           |      0 |     7 |
+| Idaho          | Ada                  |    414 |     1 |
+| Idaho          | Canyon               |    258 |     2 |
+| Idaho          | Kootenai             |    168 |     3 |
+| Idaho          | Bonneville           |    137 |     4 |
+| Idaho          | Twin Falls           |    119 |     5 |
+| Idaho          | Bannock              |     86 |     6 |
+| Idaho          | Bingham              |     59 |     7 |
+| Idaho          | Nez Perce            |     47 |     8 |
+| Idaho          | Shoshone             |     31 |     9 |
+| Idaho          | Payette              |     29 |    10 |
+| Illinois       | Cook                 |   8926 |     1 |
+| Illinois       | Unassigned           |   2045 |     2 |
+| Illinois       | DuPage               |   1115 |     3 |
+| Illinois       | Lake                 |    880 |     4 |
+| Illinois       | Will                 |    847 |     5 |
+| Illinois       | Kane                 |    680 |     6 |
+| Illinois       | Madison              |    437 |     7 |
+| Illinois       | St. Clair            |    431 |     8 |
+| Illinois       | Winnebago            |    403 |     9 |
+| Illinois       | Rock Island          |    271 |    10 |
+| Indiana        | Marion               |   1377 |     1 |
+| Indiana        | Lake                 |    710 |     2 |
+| Indiana        | Allen                |    568 |     3 |
+| Indiana        | St. Joseph           |    399 |     4 |
+| Indiana        | Unassigned           |    378 |     5 |
+| Indiana        | Elkhart              |    350 |     6 |
+| Indiana        | Hamilton             |    323 |     7 |
+| Indiana        | Johnson              |    301 |     8 |
+| Indiana        | Vanderburgh          |    264 |     9 |
+| Indiana        | Hendricks            |    262 |    10 |
+| Iowa           | Polk                 |    503 |     1 |
+| Iowa           | Linn                 |    295 |     2 |
+| Iowa           | Black Hawk           |    263 |     3 |
+| Iowa           | Woodbury             |    199 |     4 |
+| Iowa           | Scott                |    183 |     5 |
+| Iowa           | Dubuque              |    177 |     6 |
+| Iowa           | Pottawattamie        |    129 |     7 |
+| Iowa           | Wapello              |    100 |     8 |
+| Iowa           | Muscatine            |     83 |     9 |
+| Iowa           | Webster              |     81 |    10 |
+| Kansas         | Johnson              |    668 |     1 |
+| Kansas         | Sedgwick             |    545 |     2 |
+| Kansas         | Shawnee              |    281 |     3 |
+| Kansas         | Wyandotte            |    236 |     4 |
+| Kansas         | Reno                 |    122 |     5 |
+| Kansas         | Saline               |    101 |     6 |
+| Kansas         | Lyon                 |     74 |     7 |
+| Kansas         | Cowley               |     68 |     8 |
+| Kansas         | McPherson            |     67 |     9 |
+| Kansas         | Finney               |     67 |    10 |
+| Kentucky       | Jefferson            |    712 |     1 |
+| Kentucky       | Fayette              |    190 |     2 |
+| Kentucky       | Daviess              |    145 |     3 |
+| Kentucky       | Hopkins              |    115 |     4 |
+| Kentucky       | Warren               |    106 |     5 |
+| Kentucky       | Kenton               |     97 |     6 |
+| Kentucky       | Hardin               |     75 |     7 |
+| Kentucky       | Christian            |     71 |     8 |
+| Kentucky       | Pulaski              |     67 |     9 |
+| Kentucky       | Oldham               |     66 |    10 |
+| Louisiana      | Jefferson            |    798 |     1 |
+| Louisiana      | Orleans              |    732 |     2 |
+| Louisiana      | East Baton Rouge     |    691 |     3 |
+| Louisiana      | Caddo                |    628 |     4 |
+| Louisiana      | St. Tammany          |    449 |     5 |
+| Louisiana      | Ouachita             |    383 |     6 |
+| Louisiana      | Calcasieu            |    327 |     7 |
+| Louisiana      | Rapides              |    266 |     8 |
+| Louisiana      | Bossier              |    243 |     9 |
+| Louisiana      | Lafayette            |    239 |    10 |
+| Maine          | Cumberland           |    166 |     1 |
+| Maine          | York                 |    106 |     2 |
+| Maine          | Penobscot            |     70 |     3 |
+| Maine          | Androscoggin         |     54 |     4 |
+| Maine          | Kennebec             |     46 |     5 |
+| Maine          | Aroostook            |     43 |     6 |
+| Maine          | Oxford               |     40 |     7 |
+| Maine          | Hancock              |     31 |     8 |
+| Maine          | Somerset             |     26 |     9 |
+| Maine          | Waldo                |     18 |    10 |
+| Maryland       | Montgomery           |   1320 |     1 |
+| Maryland       | Prince George's      |   1243 |     2 |
+| Maryland       | Baltimore            |   1158 |     3 |
+| Maryland       | Baltimore City       |    823 |     4 |
+| Maryland       | Anne Arundel         |    481 |     5 |
+| Maryland       | Frederick            |    250 |     6 |
+| Maryland       | Washington           |    230 |     7 |
+| Maryland       | Harford              |    213 |     8 |
+| Maryland       | Howard               |    207 |     9 |
+| Maryland       | Carroll              |    194 |    10 |
+| Massachusetts  | Middlesex            |   3155 |     1 |
+| Massachusetts  | Essex                |   1991 |     2 |
+| Massachusetts  | Worcester            |   1858 |     3 |
+| Massachusetts  | Suffolk              |   1572 |     4 |
+| Massachusetts  | Norfolk              |   1484 |     5 |
+| Massachusetts  | Bristol              |   1354 |     6 |
+| Massachusetts  | Hampden              |   1210 |     7 |
+| Massachusetts  | Plymouth             |   1173 |     8 |
+| Massachusetts  | Barnstable           |    345 |     9 |
+| Massachusetts  | Hampshire            |    236 |    10 |
+| Michigan       | Wayne                |   4000 |     1 |
+| Michigan       | Oakland              |   1907 |     2 |
+| Michigan       | Macomb               |   1874 |     3 |
+| Michigan       | Genesee              |    731 |     4 |
+| Michigan       | Kent                 |    663 |     5 |
+| Michigan       | Saginaw              |    472 |     6 |
+| Michigan       | Ottawa               |    336 |     7 |
+| Michigan       | Kalamazoo            |    312 |     8 |
+| Michigan       | Muskegon             |    298 |     9 |
+| Michigan       | Bay                  |    267 |    10 |
+| Minnesota      | Hennepin             |   1539 |     1 |
+| Minnesota      | Ramsey               |    770 |     2 |
+| Minnesota      | Anoka                |    374 |     3 |
+| Minnesota      | Dakota               |    367 |     4 |
+| Minnesota      | St. Louis            |    255 |     5 |
+| Minnesota      | Washington           |    242 |     6 |
+| Minnesota      | Stearns              |    195 |     7 |
+| Minnesota      | Wright               |    108 |     8 |
+| Minnesota      | Scott                |    103 |     9 |
+| Minnesota      | Benton               |     88 |    10 |
+| Mississippi    | Hinds                |    358 |     1 |
+| Mississippi    | Rankin               |    240 |     2 |
+| Mississippi    | Harrison             |    234 |     3 |
+| Mississippi    | Lauderdale           |    212 |     4 |
+| Mississippi    | DeSoto               |    210 |     5 |
+| Mississippi    | Jackson              |    201 |     6 |
+| Mississippi    | Madison              |    182 |     7 |
+| Mississippi    | Neshoba              |    162 |     8 |
+| Mississippi    | Lee                  |    150 |     9 |
+| Mississippi    | Lowndes              |    130 |    10 |
+| Missouri       | St. Louis            |   1764 |     1 |
+| Missouri       | Kansas City          |    453 |     2 |
+| Missouri       | Greene               |    388 |     3 |
+| Missouri       | St. Charles          |    376 |     4 |
+| Missouri       | St. Louis City       |    360 |     5 |
+| Missouri       | Jackson              |    321 |     6 |
+| Missouri       | Jasper               |    203 |     7 |
+| Missouri       | Jefferson            |    181 |     8 |
+| Missouri       | Franklin             |    138 |     9 |
+| Missouri       | Clay                 |    128 |    10 |
+| Montana        | Yellowstone          |    225 |     1 |
+| Montana        | Cascade              |    144 |     2 |
+| Montana        | Missoula             |     81 |     3 |
+| Montana        | Silver Bow           |     78 |     4 |
+| Montana        | Flathead             |     74 |     5 |
+| Montana        | Big Horn             |     69 |     6 |
+| Montana        | Lewis and Clark      |     61 |     7 |
+| Montana        | Roosevelt            |     53 |     8 |
+| Montana        | Gallatin             |     46 |     9 |
+| Montana        | Rosebud              |     43 |    10 |
+| Nebraska       | Douglas              |    579 |     1 |
+| Nebraska       | Lancaster            |    141 |     2 |
+| Nebraska       | Hall                 |    105 |     3 |
+| Nebraska       | Sarpy                |     93 |     4 |
+| Nebraska       | Scotts Bluff         |     85 |     5 |
+| Nebraska       | Dakota               |     57 |     6 |
+| Nebraska       | Buffalo              |     54 |     7 |
+| Nebraska       | Dodge                |     52 |     8 |
+| Nebraska       | Platte               |     46 |     9 |
+| Nebraska       | Lincoln              |     41 |    10 |
+| Nevada         | Clark                |   3351 |     1 |
+| Nevada         | Washoe               |    604 |     2 |
+| Nevada         | Carson City          |    106 |     3 |
+| Nevada         | Nye                  |     84 |     4 |
+| Nevada         | Lyon                 |     54 |     5 |
+| Nevada         | Churchill            |     49 |     6 |
+| Nevada         | Elko                 |     44 |     7 |
+| Nevada         | Douglas              |     29 |     8 |
+| Nevada         | Pershing             |     18 |     9 |
+| Nevada         | Humboldt             |     13 |    10 |
+| New Hampshire  | Hillsborough         |    552 |     1 |
+| New Hampshire  | Rockingham           |    187 |     2 |
+| New Hampshire  | Merrimack            |     96 |     3 |
+| New Hampshire  | Belknap              |     88 |     4 |
+| New Hampshire  | Strafford            |     65 |     5 |
+| New Hampshire  | Coos                 |     28 |     6 |
+| New Hampshire  | Cheshire             |     20 |     7 |
+| New Hampshire  | Sullivan             |     16 |     8 |
+| New Hampshire  | Grafton              |     14 |     9 |
+| New Hampshire  | Carroll              |      6 |    10 |
+| New Jersey     | Essex                |   2552 |     1 |
+| New Jersey     | Bergen               |   2488 |     2 |
+| New Jersey     | Middlesex            |   1943 |     3 |
+| New Jersey     | Hudson               |   1871 |     4 |
+| New Jersey     | Ocean                |   1685 |     5 |
+| New Jersey     | Union                |   1683 |     6 |
+| New Jersey     | Passaic              |   1607 |     7 |
+| New Jersey     | Monmouth             |   1284 |     8 |
+| New Jersey     | Morris               |   1067 |     9 |
+| New Jersey     | Camden               |   1032 |    10 |
+| New Mexico     | Bernalillo           |    778 |     1 |
+| New Mexico     | McKinley             |    417 |     2 |
+| New Mexico     | San Juan             |    389 |     3 |
+| New Mexico     | Dona Ana             |    361 |     4 |
+| New Mexico     | Sandoval             |    179 |     5 |
+| New Mexico     | Chaves               |    133 |     6 |
+| New Mexico     | Lea                  |    122 |     7 |
+| New Mexico     | Santa Fe             |    121 |     8 |
+| New Mexico     | Eddy                 |    100 |     9 |
+| New Mexico     | Cibola               |    100 |    10 |
+| New York       | Kings                |   8451 |     1 |
+| New York       | Queens               |   8200 |     2 |
+| New York       | Bronx                |   5467 |     3 |
+| New York       | New York             |   3612 |     4 |
+| New York       | Suffolk              |   2828 |     5 |
+| New York       | Nassau               |   2702 |     6 |
+| New York       | Westchester          |   1938 |     7 |
+| New York       | Erie                 |   1480 |     8 |
+| New York       | Richmond             |   1464 |     9 |
+| New York       | Monroe               |    897 |    10 |
+| North Carolina | Mecklenburg          |    782 |     1 |
+| North Carolina | Wake                 |    444 |     2 |
+| North Carolina | Guilford             |    425 |     3 |
+| North Carolina | Gaston               |    328 |     4 |
+| North Carolina | Forsyth              |    283 |     5 |
+| North Carolina | Buncombe             |    256 |     6 |
+| North Carolina | Rowan                |    248 |     7 |
+| North Carolina | Catawba              |    246 |     8 |
+| North Carolina | Cumberland           |    218 |     9 |
+| North Carolina | Cabarrus             |    201 |    10 |
+| North Dakota   | Cass                 |    190 |     1 |
+| North Dakota   | Ward                 |    185 |     2 |
+| North Dakota   | Burleigh             |    185 |     3 |
+| North Dakota   | Morton               |     93 |     4 |
+| North Dakota   | Stutsman             |     76 |     5 |
+| North Dakota   | Grand Forks          |     72 |     6 |
+| North Dakota   | Stark                |     48 |     7 |
+| North Dakota   | Williams             |     35 |     8 |
+| North Dakota   | Dickey               |     32 |     9 |
+| North Dakota   | Barnes               |     31 |    10 |
+| Ohio           | Cuyahoga             |   1210 |     1 |
+| Ohio           | Summit               |    811 |     2 |
+| Ohio           | Franklin             |    712 |     3 |
+| Ohio           | Lucas                |    682 |     4 |
+| Ohio           | Stark                |    466 |     5 |
+| Ohio           | Hamilton             |    465 |     6 |
+| Ohio           | Montgomery           |    456 |     7 |
+| Ohio           | Mahoning             |    339 |     8 |
+| Ohio           | Trumbull             |    325 |     9 |
+| Ohio           | Clark                |    295 |    10 |
+| Oklahoma       | Tulsa                |    600 |     1 |
+| Oklahoma       | Oklahoma             |    595 |     2 |
+| Oklahoma       | Cleveland            |    231 |     3 |
+| Oklahoma       | Comanche             |    111 |     4 |
+| Oklahoma       | Rogers               |    103 |     5 |
+| Oklahoma       | Creek                |    101 |     6 |
+| Oklahoma       | Muskogee             |     83 |     7 |
+| Oklahoma       | Washington           |     76 |     8 |
+| Oklahoma       | Wagoner              |     70 |     9 |
+| Oklahoma       | Canadian             |     69 |    10 |
+| Oregon         | Multnomah            |    481 |     1 |
+| Oregon         | Marion               |    264 |     2 |
+| Oregon         | Washington           |    191 |     3 |
+| Oregon         | Clackamas            |    153 |     4 |
+| Oregon         | Lane                 |    114 |     5 |
+| Oregon         | Jackson              |    104 |     6 |
+| Oregon         | Umatilla             |     76 |     7 |
+| Oregon         | Yamhill              |     57 |     8 |
+| Oregon         | Malheur              |     56 |     9 |
+| Oregon         | Klamath              |     52 |    10 |
+| Pennsylvania   | Philadelphia         |   2911 |     1 |
+| Pennsylvania   | Allegheny            |   1555 |     2 |
+| Pennsylvania   | Montgomery           |   1399 |     3 |
+| Pennsylvania   | Delaware             |   1145 |     4 |
+| Pennsylvania   | Bucks                |   1042 |     5 |
+| Pennsylvania   | Lancaster            |    935 |     6 |
+| Pennsylvania   | Berks                |    815 |     7 |
+| Pennsylvania   | Lehigh               |    692 |     8 |
+| Pennsylvania   | Chester              |    652 |     9 |
+| Pennsylvania   | York                 |    646 |    10 |
+| Rhode Island   | Providence           |   1632 |     1 |
+| Rhode Island   | Kent                 |    255 |     2 |
+| Rhode Island   | Washington           |    138 |     3 |
+| Rhode Island   | Bristol              |    114 |     4 |
+| Rhode Island   | Unassigned           |     44 |     5 |
+| Rhode Island   | Newport              |     15 |     6 |
+| Rhode Island   | Out of RI            |      0 |     7 |
+| South Carolina | Greenville           |    739 |     1 |
+| South Carolina | Spartanburg          |    584 |     2 |
+| South Carolina | Horry                |    466 |     3 |
+| South Carolina | Richland             |    446 |     4 |
+| South Carolina | Charleston           |    398 |     5 |
+| South Carolina | Anderson             |    389 |     6 |
+| South Carolina | Lexington            |    386 |     7 |
+| South Carolina | Florence             |    359 |     8 |
+| South Carolina | York                 |    266 |     9 |
+| South Carolina | Pickens              |    227 |    10 |
+| South Dakota   | Minnehaha            |    311 |     1 |
+| South Dakota   | Pennington           |    171 |     2 |
+| South Dakota   | Brown                |     80 |     3 |
+| South Dakota   | Lincoln              |     74 |     4 |
+| South Dakota   | Codington            |     74 |     5 |
+| South Dakota   | Davison              |     59 |     6 |
+| South Dakota   | Turner               |     50 |     7 |
+| South Dakota   | Oglala Lakota        |     43 |     8 |
+| South Dakota   | Lawrence             |     42 |     9 |
+| South Dakota   | Beadle               |     39 |    10 |
+| Tennessee      | Shelby               |   1298 |     1 |
+| Tennessee      | Davidson             |    759 |     2 |
+| Tennessee      | Knox                 |    510 |     3 |
+| Tennessee      | Hamilton             |    385 |     4 |
+| Tennessee      | Rutherford           |    327 |     5 |
+| Tennessee      | Sumner               |    265 |     6 |
+| Tennessee      | Sullivan             |    247 |     7 |
+| Tennessee      | Washington           |    221 |     8 |
+| Tennessee      | Madison              |    201 |     9 |
+| Tennessee      | Unassigned           |    187 |    10 |
+| Texas          | Harris               |   4356 |     1 |
+| Texas          | Dallas               |   2885 |     2 |
+| Texas          | Tarrant              |   2541 |     3 |
+| Texas          | Hidalgo              |   2466 |     4 |
+| Texas          | Bexar                |   2416 |     5 |
+| Texas          | El Paso              |   2142 |     6 |
+| Texas          | Cameron              |   1341 |     7 |
+| Texas          | Travis               |    748 |     8 |
+| Texas          | Lubbock              |    705 |     9 |
+| Texas          | Nueces               |    661 |    10 |
+| Utah           | Salt Lake            |    694 |     1 |
+| Utah           | Utah                 |    290 |     2 |
+| Utah           | Southwest Utah       |    207 |     3 |
+| Utah           | Weber-Morgan         |    145 |     4 |
+| Utah           | Davis                |    123 |     5 |
+| Utah           | Bear River           |     63 |     6 |
+| Utah           | Central Utah         |     47 |     7 |
+| Utah           | San Juan             |     36 |     8 |
+| Utah           | TriCounty            |     27 |     9 |
+| Utah           | Tooele               |     23 |    10 |
+| Vermont        | Chittenden           |     80 |     1 |
+| Vermont        | Franklin             |     35 |     2 |
+| Vermont        | Washington           |     12 |     3 |
+| Vermont        | Windham              |     10 |     4 |
+| Vermont        | Rutland              |      9 |     5 |
+| Vermont        | Addison              |      8 |     6 |
+| Vermont        | Windsor              |      7 |     7 |
+| Vermont        | Orleans              |      5 |     8 |
+| Vermont        | Bennington           |      5 |     9 |
+| Vermont        | Caledonia            |      4 |    10 |
+| Virginia       | Fairfax              |    792 |     1 |
+| Virginia       | Henrico              |    345 |     2 |
+| Virginia       | Prince William       |    317 |     3 |
+| Virginia       | Virginia Beach       |    214 |     4 |
+| Virginia       | Chesterfield         |    207 |     5 |
+| Virginia       | Arlington            |    203 |     6 |
+| Virginia       | Loudoun              |    184 |     7 |
+| Virginia       | Norfolk              |    145 |     8 |
+| Virginia       | Chesapeake           |    138 |     9 |
+| Virginia       | Richmond City        |    135 |    10 |
+| Washington     | King                 |   1264 |     1 |
+| Washington     | Snohomish            |    494 |     2 |
+| Washington     | Spokane              |    479 |     3 |
+| Washington     | Pierce               |    477 |     4 |
+| Washington     | Yakima               |    373 |     5 |
+| Washington     | Clark                |    202 |     6 |
+| Washington     | Benton               |    189 |     7 |
+| Washington     | Franklin             |     95 |     8 |
+| Washington     | Kitsap               |     71 |     9 |
+| Washington     | Thurston             |     68 |    10 |
+| West Virginia  | Kanawha              |    267 |     1 |
+| West Virginia  | Cabell               |    147 |     2 |
+| West Virginia  | Wood                 |    112 |     3 |
+| West Virginia  | Mercer               |     91 |     4 |
+| West Virginia  | Berkeley             |     86 |     5 |
+| West Virginia  | Hancock              |     82 |     6 |
+| West Virginia  | Mineral              |     75 |     7 |
+| West Virginia  | Logan                |     69 |     8 |
+| West Virginia  | Putnam               |     69 |     9 |
+| West Virginia  | Fayette              |     66 |    10 |
+| Wisconsin      | Milwaukee            |   1181 |     1 |
+| Wisconsin      | Waukesha             |    490 |     2 |
+| Wisconsin      | Racine               |    328 |     3 |
+| Wisconsin      | Kenosha              |    293 |     4 |
+| Wisconsin      | Dane                 |    272 |     5 |
+| Wisconsin      | Brown                |    217 |     6 |
+| Wisconsin      | Marathon             |    201 |     7 |
+| Wisconsin      | Outagamie            |    190 |     8 |
+| Wisconsin      | Winnebago            |    189 |     9 |
+| Wisconsin      | Dodge                |    165 |    10 |
+| Wyoming        | Natrona              |    121 |     1 |
+| Wyoming        | Laramie              |     93 |     2 |
+| Wyoming        | Fremont              |     79 |     3 |
+| Wyoming        | Campbell             |     56 |     4 |
+| Wyoming        | Sweetwater           |     33 |     5 |
+| Wyoming        | Big Horn             |     28 |     6 |
+| Wyoming        | Washakie             |     26 |     7 |
+| Wyoming        | Park                 |     23 |     8 |
+| Wyoming        | Sheridan             |     22 |     9 |
+| Wyoming        | Goshen               |     21 |    10 |
++----------------+----------------------+--------+-------+
+479 rows in set (9.42 sec)
+
+mysql> 
+mysql> 
+
+
+#Query 6:
+#Prepare a report to show the progress of vaccinations
+a.Sort states by rate of vaccination for 1st dose
+b.Sort states by rate of vaccination for 2nd dose
+
+
+mysql> select state from vaccinations order by MoreThanOneDosesPer100K;
++----------------+
+| state          |
++----------------+
+| Idaho          |
+| Missouri       |
+| Iowa           |
+| Kansas         |
+| Alabama        |
+| Illinois       |
+| Tennessee      |
+| Rhode Island   |
+| Nebraska       |
+| Pennsylvania   |
+| Texas          |
+| Massachusetts  |
+| Mississippi    |
+| Maryland       |
+| Ohio           |
+| Arizona        |
+| South Carolina |
+| Minnesota      |
+| New Hampshire  |
+| Georgia        |
+| Utah           |
+| Indiana        |
+| Nevada         |
+| California     |
+| Montana        |
+| Wisconsin      |
+| New Jersey     |
+| Kentucky       |
+| Washington     |
+| Hawaii         |
+| Michigan       |
+| North Carolina |
+| Florida        |
+| Maine          |
+| Colorado       |
+| Louisiana      |
+| Arkansas       |
+| Wyoming        |
+| Oregon         |
+| Vermont        |
+| Virginia       |
+| South Dakota   |
+| Delaware       |
+| Oklahoma       |
+| North Dakota   |
+| Connecticut    |
+| New Mexico     |
+| West Virginia  |
+| Alaska         |
++----------------+
+49 rows in set (0.02 sec)
+
+mysql> Select state from vaccinations order by Two_Doses asc;
++----------------+
+| state          |
++----------------+
+| Wyoming        |
+| Delaware       |
+| Vermont        |
+| Idaho          |
+| Montana        |
+| Rhode Island   |
+| North Dakota   |
+| Alaska         |
+| Mississippi    |
+| Hawaii         |
+| South Dakota   |
+| New Hampshire  |
+| Maine          |
+| Nevada         |
+| Kansas         |
+| Nebraska       |
+| New Mexico     |
+| Alabama        |
+| Utah           |
+| Arkansas       |
+| Iowa           |
+| West Virginia  |
+| Kentucky       |
+| South Carolina |
+| Wisconsin      |
+| Oklahoma       |
+| Connecticut    |
+| Oregon         |
+| Maryland       |
+| Arizona        |
+| Louisiana      |
+| Missouri       |
+| Minnesota      |
+| Indiana        |
+| Massachusetts  |
+| Washington     |
+| Virginia       |
+| Colorado       |
+| Georgia        |
+| New Jersey     |
+| North Carolina |
+| Tennessee      |
+| Ohio           |
+| Michigan       |
+| Illinois       |
+| Pennsylvania   |
+| Florida        |
+| Texas          |
+| California     |
++----------------+
+49 rows in set (0.03 sec)
+
+
+#Query 7
+#7)Which counties in Texas has at least 5% population have been vaccinated by 1st dose?
+
+mysql> select c.county from county C join Vaccinations V on C.State=V.State  where C.State='Texas' and v.MoreThanOneDoses >=((C.population)*0.05);
++---------------+
+| county        |
++---------------+
+| Anderson      |
+| Andrews       |
+| Angelina      |
+| Aransas       |
+| Archer        |
+| Armstrong     |
+| Atascosa      |
+| Austin        |
+| Bailey        |
+| Bandera       |
+| Bastrop       |
+| Baylor        |
+| Bee           |
+| Bell          |
+| Bexar         |
+| Blanco        |
+| Borden        |
+| Bosque        |
+| Bowie         |
+| Brazoria      |
+| Brazos        |
+| Brewster      |
+| Briscoe       |
+| Brooks        |
+| Brown         |
+| Burleson      |
+| Burnet        |
+| Caldwell      |
+| Calhoun       |
+| Callahan      |
+| Cameron       |
+| Camp          |
+| Carson        |
+| Cass          |
+| Castro        |
+| Chambers      |
+| Cherokee      |
+| Childress     |
+| Clay          |
+| Cochran       |
+| Coke          |
+| Coleman       |
+| Collin        |
+| Collingsworth |
+| Colorado      |
+| Comal         |
+| Comanche      |
+| Concho        |
+| Cooke         |
+| Coryell       |
+| Cottle        |
+| Crane         |
+| Crockett      |
+| Crosby        |
+| Culberson     |
+| Dallam        |
+| Dallas        |
+| Dawson        |
+| Deaf Smith    |
+| Delta         |
+| Denton        |
+| DeWitt        |
+| Dickens       |
+| Dimmit        |
+| Donley        |
+| Duval         |
+| Eastland      |
+| Ector         |
+| Edwards       |
+| El Paso       |
+| Ellis         |
+| Erath         |
+| Falls         |
+| Fannin        |
+| Fayette       |
+| Fisher        |
+| Floyd         |
+| Foard         |
+| Fort Bend     |
+| Franklin      |
+| Freestone     |
+| Frio          |
+| Gaines        |
+| Galveston     |
+| Garza         |
+| Gillespie     |
+| Glasscock     |
+| Goliad        |
+| Gonzales      |
+| Gray          |
+| Grayson       |
+| Gregg         |
+| Grimes        |
+| Guadalupe     |
+| Hale          |
+| Hall          |
+| Hamilton      |
+| Hansford      |
+| Hardeman      |
+| Hardin        |
+| Harris        |
+| Harrison      |
+| Hartley       |
+| Haskell       |
+| Hays          |
+| Hemphill      |
+| Henderson     |
+| Hidalgo       |
+| Hill          |
+| Hockley       |
+| Hood          |
+| Hopkins       |
+| Houston       |
+| Howard        |
+| Hudspeth      |
+| Hunt          |
+| Hutchinson    |
+| Irion         |
+| Jack          |
+| Jackson       |
+| Jasper        |
+| Jeff Davis    |
+| Jefferson     |
+| Jim Hogg      |
+| Jim Wells     |
+| Johnson       |
+| Jones         |
+| Karnes        |
+| Kaufman       |
+| Kendall       |
+| Kenedy        |
+| Kent          |
+| Kerr          |
+| Kimble        |
+| King          |
+| Kinney        |
+| Kleberg       |
+| Knox          |
+| La Salle      |
+| Lamar         |
+| Lamb          |
+| Lampasas      |
+| Lavaca        |
+| Lee           |
+| Leon          |
+| Liberty       |
+| Limestone     |
+| Lipscomb      |
+| Live Oak      |
+| Llano         |
+| Loving        |
+| Lubbock       |
+| Lynn          |
+| Madison       |
+| Marion        |
+| Martin        |
+| Mason         |
+| Matagorda     |
+| Maverick      |
+| McCulloch     |
+| McLennan      |
+| McMullen      |
+| Medina        |
+| Menard        |
+| Midland       |
+| Milam         |
+| Mills         |
+| Mitchell      |
+| Montague      |
+| Montgomery    |
+| Moore         |
+| Morris        |
+| Motley        |
+| Nacogdoches   |
+| Navarro       |
+| Newton        |
+| Nolan         |
+| Nueces        |
+| Ochiltree     |
+| Oldham        |
+| Orange        |
+| Out of TX     |
+| Palo Pinto    |
+| Panola        |
+| Parker        |
+| Parmer        |
+| Pecos         |
+| Polk          |
+| Potter        |
+| Presidio      |
+| Rains         |
+| Randall       |
+| Reagan        |
+| Real          |
+| Red River     |
+| Reeves        |
+| Refugio       |
+| Roberts       |
+| Robertson     |
+| Rockwall      |
+| Runnels       |
+| Rusk          |
+| Sabine        |
+| San Augustine |
+| San Jacinto   |
+| San Patricio  |
+| San Saba      |
+| Schleicher    |
+| Scurry        |
+| Shackelford   |
+| Shelby        |
+| Sherman       |
+| Smith         |
+| Somervell     |
+| Starr         |
+| Stephens      |
+| Sterling      |
+| Stonewall     |
+| Sutton        |
+| Swisher       |
+| Tarrant       |
+| Taylor        |
+| Terrell       |
+| Terry         |
+| Throckmorton  |
+| Titus         |
+| Tom Green     |
+| Travis        |
+| Trinity       |
+| Tyler         |
+| Unassigned    |
+| Upshur        |
+| Upton         |
+| Uvalde        |
+| Val Verde     |
+| Van Zandt     |
+| Victoria      |
+| Walker        |
+| Waller        |
+| Ward          |
+| Washington    |
+| Webb          |
+| Wharton       |
+| Wheeler       |
+| Wichita       |
+| Wilbarger     |
+| Willacy       |
+| Williamson    |
+| Wilson        |
+| Winkler       |
+| Wise          |
+| Wood          |
+| Yoakum        |
+| Young         |
+| Zapata        |
+| Zavala        |
++---------------+
+256 rows in set (0.02 sec)
+
+Query 8:
+#Population per county is given but vaccination per county is not described anywhere in the table.
+So unable to match the parameters as question seems to be incorrect.
+
+
+mysql> \t

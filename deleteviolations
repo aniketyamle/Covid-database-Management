@@ -1,0 +1,8 @@
+mysql> Delete from state where state='Florida';
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`axy9230`.`confirmed_cases`, CONSTRAINT `confirmed_cases_ibfk_1` FOREIGN KEY (`State`) REFERENCES `state` (`State`))
+mysql> \t
+
+
+Here we are trying to delete state from state table which is not getting executed.
+As it is due to Referential Integrity Constraint.
+State table contains state parameter as primary key which cannot be deleted as it is referenced to other tables such as county as state as part of composite key and vaccinations also contain state as primary key.So if we need to delete those records we need to use cascade  and make the it execute.
